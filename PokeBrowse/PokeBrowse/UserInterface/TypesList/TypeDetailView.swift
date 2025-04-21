@@ -49,7 +49,8 @@ struct TypeDetailView: View {
                 
                 Spacer()
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 12)
         }
     }
 }
