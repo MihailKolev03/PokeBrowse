@@ -9,7 +9,7 @@ import SwiftUI
 
 enum PokemonsDestination {
     case main(viewModel: PokemonListViewModel)
-    case details
+    case details(viewModel: PokemonDetailViewModel)
 }
 
 extension PokemonsDestination: Hashable {
@@ -21,8 +21,8 @@ extension PokemonsDestination: Hashable {
         switch (lhs, rhs) {
         case let (.main(lhsVM), .main(rhsVM)):
             return lhsVM === rhsVM
-        case (.details, .details):
-            return true
+        case let (.details(lhsVM), .details(rhsVM)):
+            return lhsVM === rhsVM
         default:
             return false
         }
@@ -34,8 +34,8 @@ extension PokemonsDestination: View {
         switch self {
         case let .main(viewModel):
             PokemonListView(viewModel: viewModel)
-        case .details:
-            Text("Details")
+        case let .details(viewModel):
+            PokemonDetailView(viewModel: viewModel)
         }
     }
 }

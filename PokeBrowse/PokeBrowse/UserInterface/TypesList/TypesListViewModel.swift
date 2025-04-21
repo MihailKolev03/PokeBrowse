@@ -9,6 +9,7 @@ import Foundation
 
 class TypesListViewModel: ObservableObject {
     @Published var types: [NamedAPIResource] = []
+    var typeClicked: ((NamedAPIResource) -> Void)?
 
     func fetchTypes() {
         guard let url = URL(string: "https://pokeapi.co/api/v2/type/") else { return }
@@ -25,8 +26,4 @@ class TypesListViewModel: ObservableObject {
             }
         }.resume()
     }
-}
-
-struct TypeListResponse: Decodable {
-    let results: [NamedAPIResource]
 }
