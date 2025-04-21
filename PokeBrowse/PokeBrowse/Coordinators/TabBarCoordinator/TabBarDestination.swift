@@ -14,11 +14,14 @@ enum TabBarDestination: Identifiable {
             "pokemonList"
         case .types:
             "types"
+        case .favorites:
+            "favorites"
         }
     }
     
     case pokemonList(PokemonsCoordinator)
     case types(TypesCoordinator)
+    case favorites(FavoritesCoordinator)
     
     var icon: String {
         switch self {
@@ -26,6 +29,8 @@ enum TabBarDestination: Identifiable {
             return "list.clipboard"
         case .types:
             return "square.stack.3d.up"
+        case .favorites:
+            return "heart"
         }
     }
 
@@ -35,6 +40,8 @@ enum TabBarDestination: Identifiable {
             return "list.clipboard.fill"
         case .types:
             return "square.stack.3d.up.fill"
+        case .favorites:
+            return "heart.fill"
         }
     }
     
@@ -44,6 +51,8 @@ enum TabBarDestination: Identifiable {
             return "Pokemons"
         case .types:
             return "Types"
+        case .favorites:
+            return "Favorites"
         }
     }
 }
@@ -59,6 +68,8 @@ extension TabBarDestination: Hashable {
             return lhsCoord === rhsCoord
         case let (.types(lhsCoord), .types(rhsCoord)):
             return lhsCoord === rhsCoord
+        case let (.favorites(lhsCoord), .favorites(rhsCoord)):
+            return lhsCoord === rhsCoord
         default:
             assertionFailure("Unhandled case in TabBarDestination equality")
             return false
@@ -72,6 +83,8 @@ extension TabBarDestination: View {
         case let .pokemonList(coordinator):
             coordinator.start()
         case let .types(coordinator):
+            coordinator.start()
+        case let .favorites(coordinator):
             coordinator.start()
         }
     }

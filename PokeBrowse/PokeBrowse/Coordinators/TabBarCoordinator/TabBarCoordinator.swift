@@ -26,12 +26,18 @@ class TabBarCoordinator: Coordinator, ObservableObject {
         return coordinator
     }()
 
+    private lazy var favoritesCoordinator: FavoritesCoordinator = {
+        let coordinator = FavoritesCoordinator(favoritesManager: favoritesManager)
+        return coordinator
+    }()
+
     init(communicationManager: Communication, favoritesManager: FavoritesManager) {
         self.communicationManager = communicationManager
         self.favoritesManager = favoritesManager
         let pokemons = TabBarDestination.pokemonList(pokemonsCoordinator)
         let types = TabBarDestination.types(typesCoordinator)
-        destinations = [pokemons, types]
+        let favorites = TabBarDestination.favorites(favoritesCoordinator)
+        destinations = [pokemons, types, favorites]
     }
 
     @ViewBuilder
