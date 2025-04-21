@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PokemonListView: View {
-    @StateObject private var viewModel = PokemonListViewModel()
+    @StateObject var viewModel: PokemonListViewModel
     @State private var searchText = ""
 
     var body: some View {
@@ -44,5 +44,5 @@ struct PokemonListView: View {
 }
 
 #Preview {
-    PokemonListView()
+    PokemonListView(viewModel: PokemonListViewModel())
 }
