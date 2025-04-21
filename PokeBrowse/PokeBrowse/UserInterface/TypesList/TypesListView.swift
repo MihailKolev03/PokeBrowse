@@ -11,14 +11,18 @@ struct TypesListView: View {
     @StateObject var viewModel: TypesListViewModel
 
     var body: some View {
-        NavigationStack {
+        VStack {
+            Text("PokeTypes")
+                .font(.largeTitle)
+                .bold()
+                .padding(.top)
+
             List(viewModel.types, id: \.name) { type in
-                NavigationLink(destination: TypeDetailView(type: type)) {
+                Button(action: { viewModel.typeClicked?(type) }) {
                     Text(type.name.capitalized)
                         .padding(.vertical, 6)
                 }
             }
-            .navigationTitle("Types")
             .onAppear {
                 viewModel.fetchTypes()
             }

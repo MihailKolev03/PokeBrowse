@@ -8,12 +8,15 @@
 import SwiftUI
 
 struct PokemonDetailView: View {
-    let pokemon: Pokemon
-    @State private var details: PokemonDetails?
+    @StateObject var viewModel: PokemonDetailViewModel
 
     var body: some View {
         VStack {
-            if let details = details {
+            title
+
+            if viewModel.isLoading {
+                ProgressView()
+            } else if let details = viewModel.details {
                 AsyncImage(url: URL(string: details.imageURL)) { image in
                     image
                         .resizable()
@@ -22,6 +25,7 @@ struct PokemonDetailView: View {
                 } placeholder: {
                     ProgressView()
                 }
+
                 Text(details.name.capitalized)
                     .font(.largeTitle)
                     .bold()
@@ -44,66 +48,31 @@ struct PokemonDetailView: View {
 
                 Spacer()
             } else {
-                ProgressView()
+                Text("Error.")
             }
         }
         .padding()
         .onAppear {
-            fetchPokemonDetails()
+            viewModel.fetchDetails()
         }
-        .navigationTitle(pokemon.name.capitalized)
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
     }
 
-    private func fetchPokemonDetails() {
-        let url = URL(string: "https://pokeapi.co/api/v2/pokemon/\(pokemon.id)")!
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            guard let data = data else { return }
-            do {
-                let decoded = try JSONDecoder().decode(PokemonDetails.self, from: data)
-                DispatchQueue.main.async {
-                    self.details = decoded
+    private var title: some View {
+        ZStack {
+            Text(viewModel.pokemon.name.capitalized)
+                .foregroundStyle(.black.opacity(0.8))
+                .font(.largeTitle)
+                .bold()
+            HStack {
+                Button(action: { viewModel.goBack?() }) {
+                    Image(systemName: "arrow.backward")
+                        .renderingMode(.template)
+                        .foregroundStyle(.black.opacity(0.8))
                 }
-            } catch {
-                print("Грешка при детайлите: \(error)")
+                
+                Spacer()
             }
-        }.resume()
+        }
     }
-}
-
-struct PokemonDetails: Decodable {
-    let id: Int
-    let name: String
-    let height: Int
-    let weight: Int
-    let types: [String]
-
-    var imageURL: String {
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(id).png"
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case id, name, height, weight, typesContainer = "types"
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(Int.self, forKey: .id)
-        name = try container.decode(String.self, forKey: .name)
-        height = try container.decode(Int.self, forKey: .height)
-        weight = try container.decode(Int.self, forKey: .weight)
-
-        let typesArray = try container.decode([TypeSlot].self, forKey: .typesContainer)
-        types = typesArray.map { $0.type.name }
-    }
-}
-
-struct TypeSlot: Codable {
-    let slot: Int
-    let type: NamedAPIResource
-}
-
-struct NamedAPIResource: Codable {
-    let name: String
-    let url: String
 }

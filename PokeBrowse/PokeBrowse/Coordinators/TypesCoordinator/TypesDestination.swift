@@ -9,7 +9,7 @@ import SwiftUI
 
 enum TypesDestination {
     case main(viewModel: TypesListViewModel)
-    case details
+    case details(viewModel: TypeDetailViewModel)
 }
 
 extension TypesDestination: Hashable {
@@ -21,8 +21,8 @@ extension TypesDestination: Hashable {
         switch (lhs, rhs) {
         case let (.main(lhsVM), .main(rhsVM)):
             return lhsVM === rhsVM
-        case (.details, .details):
-            return true
+        case let (.details(lhsVM), .details(rhsVM)):
+            return lhsVM === rhsVM
         default:
             return false
         }
@@ -34,8 +34,8 @@ extension TypesDestination: View {
         switch self {
         case let .main(viewModel):
             TypesListView(viewModel: viewModel)
-        case .details:
-            Text("Details")
+        case let .details(viewModel):
+            TypeDetailView(viewModel: viewModel)
         }
     }
 }

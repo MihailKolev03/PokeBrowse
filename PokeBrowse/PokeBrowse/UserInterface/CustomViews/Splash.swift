@@ -18,6 +18,8 @@ struct Splash: View {
             VStack {
                 Text("PokeBrowse")
                     .foregroundStyle(.black.opacity(0.8))
+                    .font(.largeTitle)
+                    .bold()
                     .padding()
                 if moveToTop {
                     Spacer()

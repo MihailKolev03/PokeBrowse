@@ -7,17 +7,10 @@
 
 import Foundation
 
-struct Pokemon: Identifiable, Codable {
-    let id: Int
-    let name: String
-
-    var imageURL: String {
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(id).png"
-    }
-}
-
 class PokemonListViewModel: ObservableObject {
+    @Published var searchText = ""
     @Published var pokemons: [Pokemon] = []
+    var pokemonClicked: ((Pokemon) -> Void)?
 
     func fetchPokemon() {
         let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=100")!
@@ -31,7 +24,7 @@ class PokemonListViewModel: ObservableObject {
                     }
                 }
             } catch {
-                print("Грешка при декодиране: \(error)")
+                print("\(error.localizedDescription)")
             }
         }.resume()
     }
@@ -43,13 +36,4 @@ class PokemonListViewModel: ObservableObject {
             "\($0.id)" == searchText
         }
     }
-}
-
-struct PokemonListResponse: Codable {
-    let results: [PokemonAPIItem]
-}
-
-struct PokemonAPIItem: Codable {
-    let name: String
-    let url: String
 }

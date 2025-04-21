@@ -18,11 +18,26 @@ class TypesCoordinator: Coordinator, ObservableObject {
     init() {
         let typesListViewModel = TypesListViewModel()
         initialDestination = .main(viewModel: typesListViewModel)
+
+        typesListViewModel.typeClicked = { [weak self] type in
+            self?.showDetails(type: type)
+        }
     }
 
     @ViewBuilder
     func start() -> AnyView {
         AnyView(TypesCoordinatorView(coordinator: self))
+    }
+
+    func showDetails(type: NamedAPIResource) {
+        hideTabBar = true
+        let viewModel = TypeDetailViewModel(type: type)
+
+        viewModel.goBack = { [weak self] in
+            self?.removeLastPath()
+        }
+
+        path.append(.details(viewModel: viewModel))
     }
 
     func removeLastPath() {

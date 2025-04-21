@@ -8,40 +8,46 @@
 import SwiftUI
 
 struct TypeDetailView: View {
-    let type: NamedAPIResource
-    @State private var pokemon: [String] = []
+    @StateObject var viewModel: TypeDetailViewModel
 
     var body: some View {
-        List(pokemon, id: \.self) { name in
-            Text(name.capitalized)
-        }
-        .navigationTitle(type.name.capitalized)
-        .onAppear {
-            fetchPokemonOfType()
-        }
-    }
+        VStack(spacing: 16) {
+            title
 
-    private func fetchPokemonOfType() {
-        guard let url = URL(string: type.url) else { return }
-
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            guard let data = data else { return }
-            do {
-                let result = try JSONDecoder().decode(TypeDetailResponse.self, from: data)
-                DispatchQueue.main.async {
-                    self.pokemon = result.pokemon.map { $0.pokemon.name }
+            List {
+                if viewModel.isLoading {
+                    ProgressView()
+                } else if viewModel.pokemonNames.isEmpty {
+                    Text("Empty")
+                } else {
+                    ForEach(viewModel.pokemonNames, id: \.self) { name in
+                        Text(name.capitalized)
+                    }
                 }
-            } catch {
-                print("Error decoding type detail: \(error)")
             }
-        }.resume()
+        }
+        .onAppear {
+            viewModel.fetchPokemonOfType()
+        }
+        .navigationBarBackButtonHidden()
     }
-}
 
-struct TypeDetailResponse: Decodable {
-    let pokemon: [PokemonSlot]
-}
-
-struct PokemonSlot: Decodable {
-    let pokemon: NamedAPIResource
+    private var title: some View {
+        ZStack {
+            Text(viewModel.type.name.capitalized)
+                .foregroundStyle(.black.opacity(0.8))
+                .font(.largeTitle)
+                .bold()
+            HStack {
+                Button(action: { viewModel.goBack?() }) {
+                    Image(systemName: "arrow.backward")
+                        .renderingMode(.template)
+                        .foregroundStyle(.black.opacity(0.8))
+                }
+                
+                Spacer()
+            }
+            .padding()
+        }
+    }
 }
