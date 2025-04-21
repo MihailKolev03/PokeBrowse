@@ -16,7 +16,7 @@ struct PokemonAPIItem: Codable {
     let url: String
 }
 
-struct Pokemon: Identifiable, Codable {
+struct Pokemon: Identifiable, Codable, Equatable {
     let id: Int
     let name: String
 

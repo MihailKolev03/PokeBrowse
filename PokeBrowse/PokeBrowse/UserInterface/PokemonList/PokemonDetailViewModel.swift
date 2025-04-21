@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class PokemonDetailViewModel: ObservableObject {
     @Published var details: PokemonDetails?
@@ -13,12 +14,18 @@ class PokemonDetailViewModel: ObservableObject {
 
     let pokemon: Pokemon
     private let communication: GetPokemonDetailCommunication
+    private let favorites: FavoritesCommunication
+
+    @Published var isFavorite: Bool
 
     var goBack: Event?
 
-    init(pokemon: Pokemon, communication: GetPokemonDetailCommunication) {
+    init(pokemon: Pokemon, communication: GetPokemonDetailCommunication, favorites: FavoritesCommunication) {
         self.pokemon = pokemon
         self.communication = communication
+        self.favorites = favorites
+
+        self.isFavorite = favorites.isFavorite(pokemon)
     }
 
     func fetchDetails() {
@@ -36,5 +43,10 @@ class PokemonDetailViewModel: ObservableObject {
                 }
             }
         }
+    }
+
+    func toggleFavorite() {
+        favorites.toggle(pokemon: pokemon)
+        isFavorite.toggle()
     }
 }
