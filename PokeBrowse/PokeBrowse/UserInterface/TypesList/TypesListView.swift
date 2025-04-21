@@ -29,7 +29,3 @@ struct TypesListView: View {
         }
     }
 }
-
-#Preview {
-    TypesListView(viewModel: TypesListViewModel())
-}

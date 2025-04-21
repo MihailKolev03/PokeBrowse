@@ -11,19 +11,22 @@ class TypesListViewModel: ObservableObject {
     @Published var types: [NamedAPIResource] = []
     var typeClicked: ((NamedAPIResource) -> Void)?
 
-    func fetchTypes() {
-        guard let url = URL(string: "https://pokeapi.co/api/v2/type/") else { return }
+    private let communication: GetAllTypesCommunication
 
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            guard let data = data else { return }
+    init(communication: GetAllTypesCommunication) {
+        self.communication = communication
+    }
+
+    func fetchTypes() {
+        Task {
             do {
-                let result = try JSONDecoder().decode(TypeListResponse.self, from: data)
+                let result = try await communication.getAllTypes()
                 DispatchQueue.main.async {
                     self.types = result.results
                 }
             } catch {
-                print("Error decoding types: \(error)")
+                print("Error loading Pokémon types: \(error)")
             }
-        }.resume()
+        }
     }
 }

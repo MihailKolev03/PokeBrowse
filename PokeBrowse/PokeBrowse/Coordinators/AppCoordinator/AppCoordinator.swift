@@ -9,16 +9,18 @@ import Combine
 import SwiftUI
 
 typealias Event = () -> Void
+typealias Communication = GetPokemonListCommunication & GetPokemonDetailCommunication & GetAllTypesCommunication & GetPokemonByTypeCommunication
 
 class AppCoordinator: Coordinator, ObservableObject {
     var childCoordinators = [Coordinator]()
+    var communicationManager: Communication
 
     @Published var appState: AppDestination
 
     @MainActor
     init() {
         appState = .loading
-
+        communicationManager = CommunicationManager()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
             guard let self = self else { return }
 
@@ -31,7 +33,7 @@ class AppCoordinator: Coordinator, ObservableObject {
     }
 
     private func startMainAppFlow() {
-        let tabBarCoordinator = TabBarCoordinator()
+        let tabBarCoordinator = TabBarCoordinator(communicationManager: communicationManager)
         appState = .tabBar(tabBarCoordinator)
     }
 

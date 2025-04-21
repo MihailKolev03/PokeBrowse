@@ -10,23 +10,29 @@ import Foundation
 class PokemonListViewModel: ObservableObject {
     @Published var searchText = ""
     @Published var pokemons: [Pokemon] = []
-    var pokemonClicked: ((Pokemon) -> Void)?
 
-    func fetchPokemon() {
-        let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=100")!
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            guard let data = data else { return }
+    var pokemonClicked: ((Pokemon) -> Void)?
+    private let communication: GetPokemonListCommunication
+
+    init(communication: GetPokemonListCommunication) {
+        self.communication = communication
+    }
+
+    func fetchPokemon(limit: Int = 100, offset: Int = 0) {
+        Task {
             do {
-                let result = try JSONDecoder().decode(PokemonListResponse.self, from: data)
+                let response = try await communication.getPokemonList(limit: limit, offset: offset)
+                let mapped = response.results.enumerated().map { index, item in
+                    Pokemon(id: index + 1 + offset, name: item.name)
+                }
+
                 DispatchQueue.main.async {
-                    self.pokemons = result.results.enumerated().map { (index, item) in
-                        Pokemon(id: index + 1, name: item.name)
-                    }
+                    self.pokemons = mapped
                 }
             } catch {
-                print("\(error.localizedDescription)")
+                print("Error fetching Pokémon list: \(error)")
             }
-        }.resume()
+        }
     }
 
     func filteredPokemon(searchText: String) -> [Pokemon] {

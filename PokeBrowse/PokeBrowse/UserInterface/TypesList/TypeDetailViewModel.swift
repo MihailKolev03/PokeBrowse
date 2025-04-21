@@ -10,32 +10,33 @@ import Foundation
 class TypeDetailViewModel: ObservableObject {
     @Published var pokemonNames: [String] = []
     @Published var isLoading = true
+
     let type: NamedAPIResource
+    private let communication: GetPokemonByTypeCommunication
 
     var goBack: Event?
 
-    init(type: NamedAPIResource) {
+    init(type: NamedAPIResource, communication: GetPokemonByTypeCommunication) {
         self.type = type
+        self.communication = communication
     }
 
     func fetchPokemonOfType() {
-        guard let url = URL(string: type.url) else { return }
-
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            DispatchQueue.main.async {
-                self.isLoading = false
-            }
-
-            guard let data = data else { return }
-
+        Task {
             do {
-                let result = try JSONDecoder().decode(TypeDetailResponse.self, from: data)
+                let response = try await communication.getPokemonByType(url: type.url)
+                let names = response.pokemon.map { $0.pokemon.name }
+
                 DispatchQueue.main.async {
-                    self.pokemonNames = result.pokemon.map { $0.pokemon.name }
+                    self.pokemonNames = names
+                    self.isLoading = false
                 }
             } catch {
-                print("Error decoding type detail: \(error)")
+                print("Error loading Pokémon by type: \(error)")
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                }
             }
-        }.resume()
+        }
     }
 }

@@ -7,16 +7,21 @@
 
 import SwiftUI
 
+typealias TypesCommunication = GetAllTypesCommunication & GetPokemonByTypeCommunication
+
 class TypesCoordinator: Coordinator, ObservableObject {
     var childCoordinators = [Coordinator]()
 
     @Published var path = [TypesDestination]()
     @Published var hideTabBar = false
 
+    var communication: TypesCommunication
+
     var initialDestination: TypesDestination
 
-    init() {
-        let typesListViewModel = TypesListViewModel()
+    init(communication: TypesCommunication) {
+        self.communication = communication
+        let typesListViewModel = TypesListViewModel(communication: communication)
         initialDestination = .main(viewModel: typesListViewModel)
 
         typesListViewModel.typeClicked = { [weak self] type in
@@ -31,7 +36,7 @@ class TypesCoordinator: Coordinator, ObservableObject {
 
     func showDetails(type: NamedAPIResource) {
         hideTabBar = true
-        let viewModel = TypeDetailViewModel(type: type)
+        let viewModel = TypeDetailViewModel(type: type, communication: communication)
 
         viewModel.goBack = { [weak self] in
             self?.removeLastPath()

@@ -5,43 +5,36 @@
 //  Created by Mihail Kolev on 21/04/2025.
 //
 
-
 import Foundation
 
 class PokemonDetailViewModel: ObservableObject {
     @Published var details: PokemonDetails?
     @Published var isLoading = true
+
     let pokemon: Pokemon
+    private let communication: GetPokemonDetailCommunication
 
     var goBack: Event?
 
-    init(pokemon: Pokemon) {
+    init(pokemon: Pokemon, communication: GetPokemonDetailCommunication) {
         self.pokemon = pokemon
+        self.communication = communication
     }
 
     func fetchDetails() {
-        guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon/\(pokemon.id)") else {
-            print("Невалиден URL")
-            return
-        }
-
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            DispatchQueue.main.async {
-                self.isLoading = false
-            }
-            guard let data = data, error == nil else {
-                print("Грешка при заявката: \(error?.localizedDescription ?? "Unknown error")")
-                return
-            }
-
+        Task {
             do {
-                let decoded = try JSONDecoder().decode(PokemonDetails.self, from: data)
+                let data = try await communication.getPokemonDetails(id: pokemon.id)
                 DispatchQueue.main.async {
-                    self.details = decoded
+                    self.details = data
+                    self.isLoading = false
                 }
             } catch {
-                print("Грешка при декодиране: \(error)")
+                print("Error loading Pokémon details: \(error)")
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                }
             }
-        }.resume()
+        }
     }
 }
