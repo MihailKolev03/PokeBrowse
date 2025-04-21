@@ -11,47 +11,48 @@ struct PokemonDetailView: View {
     @StateObject var viewModel: PokemonDetailViewModel
 
     var body: some View {
-        VStack {
-            title
+        ZStack {
+            Color(.systemGroupedBackground).ignoresSafeArea()
 
-            if viewModel.isLoading {
-                ProgressView()
-            } else if let details = viewModel.details {
-                AsyncImage(url: URL(string: details.imageURL)) { image in
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 150, height: 150)
-                } placeholder: {
+            VStack {
+                title
+
+                if viewModel.isLoading {
                     ProgressView()
-                }
-
-                Text(details.name.capitalized)
-                    .font(.largeTitle)
-                    .bold()
-                    .padding(.top)
-
-                Text("ID: \(details.id)")
-                Text("Height: \(details.height)")
-                Text("Weight: \(details.weight)")
-
-                HStack {
-                    Text("Types:")
-                        .bold()
-                    ForEach(details.types, id: \.self) { type in
-                        Text(type.capitalized)
-                            .padding(6)
-                            .background(Color.blue.opacity(0.2))
-                            .cornerRadius(8)
+                } else if let details = viewModel.details {
+                    AsyncImage(url: URL(string: details.imageURL)) { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 150, height: 150)
+                    } placeholder: {
+                        ProgressView()
                     }
-                }
 
-                Spacer()
-            } else {
-                Text("Error.")
+                    pageTitle(details.name.capitalized)
+
+                    TypographyText(text: "ID: \(details.id)", typography: .bodyRegular)
+                    TypographyText(text: "Height: \(details.height)", typography: .bodyRegular)
+                    TypographyText(text: "Weight: \(details.weight)", typography: .bodyRegular)
+
+                    HStack {
+                        TypographyText(text: "Types:", typography: .bodyMedium)
+
+                        ForEach(details.types, id: \.self) { type in
+                            TypographyText(text: "Types:", typography: .bodyRegular)
+                                .padding(6)
+                                .background(Color.blue.opacity(0.2))
+                                .cornerRadius(8)
+                        }
+                    }
+
+                    Spacer()
+                } else {
+                    EmptyView()
+                }
             }
+            .padding()
         }
-        .padding()
         .onAppear {
             viewModel.fetchDetails()
         }
@@ -60,17 +61,15 @@ struct PokemonDetailView: View {
 
     private var title: some View {
         ZStack {
-            Text(viewModel.pokemon.name.capitalized)
-                .foregroundStyle(.black.opacity(0.8))
-                .font(.largeTitle)
-                .bold()
+            pageTitle(viewModel.pokemon.name.capitalized)
+
             HStack {
                 Button(action: { viewModel.goBack?() }) {
                     Image(systemName: "arrow.backward")
                         .renderingMode(.template)
                         .foregroundStyle(.black.opacity(0.8))
                 }
-                
+
                 Spacer()
 
                 Button(action: {

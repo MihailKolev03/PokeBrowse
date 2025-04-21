@@ -11,20 +11,23 @@ struct TypesListView: View {
     @StateObject var viewModel: TypesListViewModel
 
     var body: some View {
-        VStack {
-            Text("PokeTypes")
-                .font(.largeTitle)
-                .bold()
-                .padding(.top)
+        ZStack {
+            Color(.systemGroupedBackground).ignoresSafeArea()
 
-            List(viewModel.types, id: \.name) { type in
-                Button(action: { viewModel.typeClicked?(type) }) {
-                    Text(type.name.capitalized)
-                        .padding(.vertical, 6)
+            VStack {
+                pageTitle("PokeTypes")
+
+                List(viewModel.types, id: \.name) { type in
+                    Button(action: { viewModel.typeClicked?(type) }) {
+                        TypographyText(text: type.name.capitalized, typography: .bodyRegular)
+                            .foregroundColor(.primary)
+                            .padding(.vertical, 8)
+                    }
                 }
-            }
-            .onAppear {
-                viewModel.fetchTypes()
+                .listStyle(.insetGrouped)
+                .onAppear {
+                    viewModel.fetchTypes()
+                }
             }
         }
     }

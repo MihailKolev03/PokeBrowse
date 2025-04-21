@@ -13,7 +13,7 @@ struct PokemonCardView: View {
     let toggleFavorite: () -> Void
 
     var body: some View {
-        VStack {
+        VStack(spacing: 8) {
             AsyncImage(url: URL(string: pokemon.imageURL)) { phase in
                 switch phase {
                 case .success(let image):
@@ -21,7 +21,7 @@ struct PokemonCardView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(height: 80)
-                case .failure(_):
+                case .failure:
                     Image(systemName: "xmark.octagon")
                         .resizable()
                         .scaledToFit()
@@ -30,19 +30,20 @@ struct PokemonCardView: View {
                     ProgressView()
                 }
             }
-            Text(pokemon.name.capitalized)
-                .font(.headline)
+
+            TypographyText(text: pokemon.name.capitalized, typography: .bodyRegular)
                 .foregroundColor(.primary)
 
             Button(action: toggleFavorite) {
                 Image(systemName: isFavorite ? "heart.fill" : "heart")
                     .foregroundColor(.red)
+                    .imageScale(.large)
             }
             .buttonStyle(.plain)
         }
         .padding()
-        .background(Color.yellow.opacity(0.2))
-        .cornerRadius(16)
-        .shadow(radius: 2)
+        .background(.ultraThinMaterial)
+        .cornerRadius(20)
+        .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 3)
     }
 }
