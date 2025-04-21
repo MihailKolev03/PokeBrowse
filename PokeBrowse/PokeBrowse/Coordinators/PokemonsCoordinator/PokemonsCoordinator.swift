@@ -16,12 +16,15 @@ class PokemonsCoordinator: Coordinator, ObservableObject {
     @Published var hideTabBar = false
 
     var communication: PokemonsCommunication
+    var favoritesManager: FavoritesManager
 
     var initialDestination: PokemonsDestination
 
-    init(communication: PokemonsCommunication) {
+    init(communication: PokemonsCommunication, favoritesManager: FavoritesManager) {
         self.communication = communication
-        let pokemonListViewModel = PokemonListViewModel(communication: communication)
+        self.favoritesManager = favoritesManager
+
+        let pokemonListViewModel = PokemonListViewModel(communication: communication, favorites: favoritesManager)
         initialDestination = .main(viewModel: pokemonListViewModel)
         pokemonListViewModel.pokemonClicked = { [weak self] pokemon in
             self?.showDetails(pokemon: pokemon)
@@ -35,7 +38,7 @@ class PokemonsCoordinator: Coordinator, ObservableObject {
 
     func showDetails(pokemon: Pokemon) {
         hideTabBar = true
-        let viewModel = PokemonDetailViewModel(pokemon: pokemon, communication: communication)
+        let viewModel = PokemonDetailViewModel(pokemon: pokemon, communication: communication, favorites: favoritesManager)
 
         viewModel.goBack = { [weak self] in
             self?.removeLastPath()

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PokemonCardView: View {
     let pokemon: Pokemon
+    let isFavorite: Bool
+    let toggleFavorite: () -> Void
 
     var body: some View {
         VStack {
@@ -31,6 +33,12 @@ struct PokemonCardView: View {
             Text(pokemon.name.capitalized)
                 .font(.headline)
                 .foregroundColor(.primary)
+
+            Button(action: toggleFavorite) {
+                Image(systemName: isFavorite ? "heart.fill" : "heart")
+                    .foregroundColor(.red)
+            }
+            .buttonStyle(.plain)
         }
         .padding()
         .background(Color.yellow.opacity(0.2))

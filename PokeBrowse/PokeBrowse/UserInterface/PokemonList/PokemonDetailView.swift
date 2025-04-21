@@ -72,6 +72,13 @@ struct PokemonDetailView: View {
                 }
                 
                 Spacer()
+
+                Button(action: {
+                    viewModel.toggleFavorite()
+                }) {
+                    Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
+                        .foregroundColor(.red)
+                }
             }
         }
     }

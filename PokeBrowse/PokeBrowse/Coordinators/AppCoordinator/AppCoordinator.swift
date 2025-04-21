@@ -14,6 +14,7 @@ typealias Communication = GetPokemonListCommunication & GetPokemonDetailCommunic
 class AppCoordinator: Coordinator, ObservableObject {
     var childCoordinators = [Coordinator]()
     var communicationManager: Communication
+    let favoritesManager: FavoritesManager
 
     @Published var appState: AppDestination
 
@@ -21,6 +22,7 @@ class AppCoordinator: Coordinator, ObservableObject {
     init() {
         appState = .loading
         communicationManager = CommunicationManager()
+        favoritesManager = FavoritesManager()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
             guard let self = self else { return }
 
@@ -33,7 +35,7 @@ class AppCoordinator: Coordinator, ObservableObject {
     }
 
     private func startMainAppFlow() {
-        let tabBarCoordinator = TabBarCoordinator(communicationManager: communicationManager)
+        let tabBarCoordinator = TabBarCoordinator(communicationManager: communicationManager, favoritesManager: favoritesManager)
         appState = .tabBar(tabBarCoordinator)
     }
 
