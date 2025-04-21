@@ -16,11 +16,7 @@ struct Splash: View {
                 .ignoresSafeArea()
 
             VStack {
-                Text("PokeBrowse")
-                    .foregroundStyle(.black.opacity(0.8))
-                    .font(.largeTitle)
-                    .bold()
-                    .padding()
+                pageTitle("PokeBrowse")
                 if moveToTop {
                     Spacer()
                 }

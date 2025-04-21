@@ -11,17 +11,21 @@ struct TypeDetailView: View {
     @StateObject var viewModel: TypeDetailViewModel
 
     var body: some View {
-        VStack(spacing: 16) {
-            title
+        ZStack {
+            Color(.systemGroupedBackground).ignoresSafeArea()
 
-            List {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else if viewModel.pokemonNames.isEmpty {
-                    Text("Empty")
-                } else {
-                    ForEach(viewModel.pokemonNames, id: \.self) { name in
-                        Text(name.capitalized)
+            VStack(spacing: 16) {
+                title
+
+                List {
+                    if viewModel.isLoading {
+                        ProgressView()
+                    } else if viewModel.pokemonNames.isEmpty {
+                        TypographyText(text: "Empty", typography: .bodyRegular)
+                    } else {
+                        ForEach(viewModel.pokemonNames, id: \.self) { name in
+                            TypographyText(text: name.capitalized, typography: .bodyRegular)
+                        }
                     }
                 }
             }
@@ -34,10 +38,8 @@ struct TypeDetailView: View {
 
     private var title: some View {
         ZStack {
-            Text(viewModel.type.name.capitalized)
-                .foregroundStyle(.black.opacity(0.8))
-                .font(.largeTitle)
-                .bold()
+            pageTitle(viewModel.type.name.capitalized)
+
             HStack {
                 Button(action: { viewModel.goBack?() }) {
                     Image(systemName: "arrow.backward")
