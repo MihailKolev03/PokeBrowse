@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct PokeBrowseApp: App {
+    @StateObject var appCoordinator = AppCoordinator()
+
     var body: some Scene {
         WindowGroup {
-            PokemonListView()
+            ZStack {
+                appCoordinator.start()
+                    .preferredColorScheme(.light)
+            }
         }
     }
 }
